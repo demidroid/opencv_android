@@ -1,0 +1,49 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 27
+    buildToolsVersion '26.0.2'
+
+    defaultConfig {
+        minSdkVersion 8
+        targetSdkVersion 27
+        versionCode 3300
+        versionName "3.3.0"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        externalNativeBuild {
+            cmake {
+                cppFlags "-frtti -fexceptions"
+                // TODO: 22-Nov-17 ahasbini: revert back abiFilter once OpenCV has been updated
+                //abiFilters 'x86', 'x86_64', 'armeabi', 'armeabi-v7a', 'arm64-v8a', 'mips', 'mips64'
+                abiFilters 'armeabi', 'armeabi-v7a', 'arm64-v8a', 'mips', 'mips64'
+            }
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            path "CMakeLists.txt"
+        }
+    }
+    sourceSets {
+        main {
+            jni.srcDirs = [jni.srcDirs, 'src/sdk/native/jni/include']
+            jniLibs.srcDirs = [jniLibs.srcDirs, 'src/sdk/native/3rdparty/libs', 'src/sdk/native/libs']
+        }
+    }
+}
+
+dependencies {
+    api fileTree(include: ['*.jar'], dir: 'libs')
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    testImplementation 'junit:junit:4.12'
+}
